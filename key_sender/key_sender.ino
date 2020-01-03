@@ -26,7 +26,7 @@ byte p1ColPins[colAmount] = { 28, 26, 24, 22 };
 byte p2RowPins[rowAmount] = { 37, 35, 33, 31 };
 byte p2ColPins[colAmount] = { 36, 34, 32, 30 };
 
-char message[2] = { keyNone, keyNone };
+char message[] = { keyNone, keyNone };
 
 void setup()
 {
@@ -82,6 +82,14 @@ bool isKeyDown(byte rowPins[], byte colPins[], int i, int j)
   return result;
 }
 
+void writeMessage(char *s) 
+{
+  uint8_t c;
+  while (c = *s++) {
+    Wire.write(c);
+  }
+}
+
 void handleRequest() {
-  Wire.write(message);
+  writeMessage(message);
 }

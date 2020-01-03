@@ -37,7 +37,7 @@ class Snake {
     return size;
   }
 
-  Point getPosition(int index) {
+  Point &getPosition(int index) {
     return position[index];
   }
 
@@ -183,7 +183,7 @@ class Game {
   bool isDraw() {
     return state == DRAW;
   }
-  bool isPlayer1Win {
+  bool isPlayer1Win() {
     return state == PLAYER1_WIN;
   }
 

@@ -1,7 +1,7 @@
 #include <Wire.h>
 #include <Servo.h>
+#include <LedControl.h>
 #include "Game.h"
-#include "LedControl.h"
 
 #define INVALID_DIRECTION -1
 
@@ -72,16 +72,17 @@ void loop() {
     updateDisplay();
   }
   else {
-    if (game.isDraw) {
+    if (game.isDraw()) {
       player1Servo.write(positionWin);
-      player2Servo.write(PositionWin);
+      player2Servo.write(positionWin);
     }
-    else if (game.isPlayer1Win) {
+    else if (game.isPlayer1Win()) {
       player1Servo.write(positionWin);
     }
     else {
       player1Servo.write(positionWin);
     }
+    delay(500);
   }
 }
 
@@ -125,9 +126,8 @@ void drawFood(Point &food) {
 void updateInput() {
   Wire.requestFrom(keypadAdderss, 1);
   if (Wire.available()) {
-    char keys[2] = Wire.read();
-    char p1Key = keys[0];
-    char p2Key = keys[1];
+    char p1Key = Wire.read();
+    char p2Key = Wire.read();
     if (p1Key != keyNone) {
       player1CurrentKey = p1Key;
     }
@@ -144,7 +144,7 @@ void updateGame() {
       game.setPlayer1Direction(player1Direction);
     }
     Direction player2Direction = keyToDirection(player2CurrentKey);
-    if (player21Direction > INVALID_DIRECTION) {
+    if (player2Direction > INVALID_DIRECTION) {
       game.setPlayer2Direction(player2Direction);
     }
     game.update();
