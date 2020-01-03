@@ -1,4 +1,5 @@
 #include <Wire.h>
+#include <Servo.h>
 #include "Game.h"
 #include "LedControl.h"
 
@@ -30,6 +31,15 @@ bool showingFood = true;
 char player1CurrentKey = keyNone;
 char player2CurrentKey = keyNone;
 
+const int player1ServoPin = 11;
+const int player2ServoPin = 12;
+
+const int positionIdle = 0;
+const int positionWin = 90;
+
+Servo player1Servo;
+Servo player2Servo;
+
 void setup() {
   for (int i=0; i<ledDisplay.getDeviceCount(); i++)
   {
@@ -45,6 +55,13 @@ void setup() {
   */
   Serial.begin(115200);
   Wire.begin();
+  
+  player1Servo.attach(player1ServoPin);
+  player2Servo.attach(player2ServoPin);
+  player1Servo.write(positionIdle);
+  player2Servo.write(positionIdle);
+  delay(500);
+  
   Serial.println(game.isRunning());
 }
 
@@ -53,6 +70,18 @@ void loop() {
     updateInput();
     updateGame();
     updateDisplay();
+  }
+  else {
+    if (game.isDraw) {
+      player1Servo.write(positionWin);
+      player2Servo.write(PositionWin);
+    }
+    else if (game.isPlayer1Win) {
+      player1Servo.write(positionWin);
+    }
+    else {
+      player1Servo.write(positionWin);
+    }
   }
 }
 
