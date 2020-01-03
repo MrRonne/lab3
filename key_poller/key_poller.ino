@@ -4,20 +4,20 @@
 
 #define INVALID_DIRECTION -1
 
+const int keypadAdderss = 10;
+
 const char keyUp = 'U';
 const char keyDown = 'D';
 const char keyRight = 'R';
 const char keyLeft = 'L';
 const char keyNone = 'N';
 
-const int keypadAdderss = 10;
-
-const int boardSizeX = 8;
+const int boardSizeX = 24;
 const int boardSizeY = 8;
 
 Game game(boardSizeX, boardSizeY);
 
-LedControl ledDisplay = LedControl(26, 22, 24, 1);  // (DIN, CLK, CS, Количество дисплеев)
+LedControl ledDisplay = LedControl(26, 22, 24, 3);  // (DIN, CLK, CS, Количество дисплеев)
 
 uint64_t lastGameUpdate;
 uint64_t lastDisplayUpdate;
@@ -27,24 +27,28 @@ const uint64_t displayUpdateDelayMs = 100;
 const uint64_t foodBlinkDelayMs = 200;
 bool showingFood = true;
 
-char currentKey = keyNone;
+char player1CurrentKey = keyNone;
+char player2CurrentKey = keyNone;
 
-void setup()
-{
-  ledDisplay.shutdown(0, false);
-  ledDisplay.setIntensity(0, 10);
-  ledDisplay.clearDisplay(0);
+void setup() {
+  for (int i=0; i<ledDisplay.getDeviceCount(); i++)
+  {
+    ledDisplay.shutdown(i, false);
+    ledDisplay.setIntensity(i, 10);
+    ledDisplay.clearDisplay(i);
+  }
+  /*
   Point point;
   point.x = 1;
   point.y = 2;
   drawPoint(point);
+  */
   Serial.begin(115200);
   Wire.begin();
   Serial.println(game.isRunning());
 }
 
-void loop()
-{
+void loop() {
   if (game.isRunning()) {
     updateInput();
     updateGame();
@@ -52,8 +56,7 @@ void loop()
   }
 }
 
-Direction keyToDirection(char key)
-{
+Direction keyToDirection(char key) {
   switch(key) {
     case keyUp: return UP;
     case keyDown: return DOWN;
@@ -63,28 +66,24 @@ Direction keyToDirection(char key)
   return INVALID_DIRECTION;
 }
 
-char readKey()
-{
+char readKey() {
   Wire.requestFrom(keypadAdderss, 1);
   if (Wire.available()) {
     return Wire.read();
   }
 }
 
-void drawPoint(Point point)
-{
+void drawPoint(Point point) {
   ledDisplay.setLed(0, boardSizeY - 1 - point.y, point.x, true);
 }
 
-void drawSnake(Snake &snake)
-{
+void drawSnake(Snake &snake) {
   for (int i = 0; i < snake.getSize(); i++) {
     drawPoint(snake.getPosition(i));
   }
 }
 
-void drawFood(Point &food)
-{
+void drawFood(Point &food) {
   if (showingFood) {
     drawPoint(food);
   }
@@ -95,31 +94,47 @@ void drawFood(Point &food)
 }
 
 void updateInput() {
-  char key = readKey();
-  if (key != keyNone) {
-    currentKey = key;
+  Wire.requestFrom(keypadAdderss, 1);
+  if (Wire.available()) {
+    char keys[2] = Wire.read();
+    char p1Key = keys[0];
+    char p2Key = keys[1];
+    if (p1Key != keyNone) {
+      player1CurrentKey = p1Key;
+    }
+    if (p2Key != keyNone) {
+      player2CurrentKey = p2Key;
+    }
   }
 }
 
-void updateGame()
-{
+void updateGame() {
   if (millis() - lastGameUpdate > gameUpdateDelayMs) {
-    if (currentKey != keyNone) {
-      game.setSnakeDirection(keyToDirection(currentKey));
+    Direction player1Direction = keyToDirection(player1CurrentKey);
+    if (player1Direction > INVALID_DIRECTION) {
+      game.setPlayer1Direction(player1Direction);
+    }
+    Direction player2Direction = keyToDirection(player2CurrentKey);
+    if (player21Direction > INVALID_DIRECTION) {
+      game.setPlayer2Direction(player2Direction);
     }
     game.update();
-    currentKey = keyNone;
+    player1CurrentKey = keyNone;
+    player2CurrentKey = keyNone;
     lastGameUpdate = millis();
   }
 }
 
-void updateDisplay()
-{
+void updateDisplay() {
   if (millis() - lastDisplayUpdate > displayUpdateDelayMs) {
-    Snake snake = game.getSnake();
+    Snake player1 = game.getPlayer1();
+    Snake player2 = game.getPlayer2();
     Point food = game.getFood();
-    ledDisplay.clearDisplay(0);
-    drawSnake(snake);
+    for (int i = 0; i < ledDisplay.getDeviceCount(); i++) {
+      ledDisplay.clearDisplay(i);
+    }
+    drawSnake(player1);
+    drawSnake(player2);
     drawFood(food);
     lastDisplayUpdate = millis();
   }
