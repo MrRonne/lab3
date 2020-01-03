@@ -18,30 +18,30 @@ char keyMatrix[rowAmount][colAmount] = {
   {keyNone, keyNone,  keyNone,  keyNone}
 };
 
-static bool p1KeyDownMatrix[rowAmount][colAmount];
-static bool p2KeyDownMatrix[rowAmount][colAmount];
+static bool player1KeyDownMatrix[rowAmount][colAmount];
+static bool player2KeyDownMatrix[rowAmount][colAmount];
 
-byte p1RowPins[rowAmount] = { 29, 27, 25, 23 };
-byte p1ColPins[colAmount] = { 28, 26, 24, 22 };
-byte p2RowPins[rowAmount] = { 37, 35, 33, 31 };
-byte p2ColPins[colAmount] = { 36, 34, 32, 30 };
+byte player1RowPins[rowAmount] = { 29, 27, 25, 23 };
+byte player1ColPins[colAmount] = { 28, 26, 24, 22 };
+byte player2RowPins[rowAmount] = { 37, 35, 33, 31 };
+byte player2ColPins[colAmount] = { 36, 34, 32, 30 };
 
 char message[] = { keyNone, keyNone };
 
 void setup()
 {
   for (int i = 0; i < rowAmount; i++) {
-    pinMode(p1RowPins[i], OUTPUT);
-    pinMode(p2RowPins[i], OUTPUT);
-    digitalWrite(p1RowPins[i], HIGH);
-    digitalWrite(p2RowPins[i], HIGH);
+    pinMode(player1RowPins[i], OUTPUT);
+    pinMode(player2RowPins[i], OUTPUT);
+    digitalWrite(player1RowPins[i], HIGH);
+    digitalWrite(player2RowPins[i], HIGH);
   }
 
   for (int i = 0; i < colAmount; i++) {
-    pinMode(p1ColPins[i], INPUT);
-    pinMode(p2ColPins[i], INPUT);
-    digitalWrite(p1ColPins[i], HIGH);
-    digitalWrite(p2ColPins[i], HIGH);
+    pinMode(player1ColPins[i], INPUT);
+    pinMode(player2ColPins[i], INPUT);
+    digitalWrite(player1ColPins[i], HIGH);
+    digitalWrite(player2ColPins[i], HIGH);
   }
 
   Serial.begin(115200);
@@ -51,10 +51,10 @@ void setup()
 
 void loop()
 {
-  char p1CurrentKey = getKey(p1RowPins, p1ColPins);
-  char p2CurrentKey = getKey(p2RowPins, p2ColPins);
-  message[0] = p1CurrentKey;
-  message[1] = p2CurrentKey;
+  char player1CurrentKey = getKey(player1RowPins, player1ColPins);
+  char player2CurrentKey = getKey(player2RowPins, player2ColPins);
+  message[0] = player1CurrentKey;
+  message[1] = player2CurrentKey;
   Serial.println(message);
 }
 
