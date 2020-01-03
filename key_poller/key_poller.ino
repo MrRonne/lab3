@@ -96,13 +96,6 @@ Direction keyToDirection(char key) {
   return INVALID_DIRECTION;
 }
 
-char readKey() {
-  Wire.requestFrom(keypadAdderss, 1);
-  if (Wire.available()) {
-    return Wire.read();
-  }
-}
-
 void drawPoint(Point point) {
   ledDisplay.setLed(0, boardSizeY - 1 - point.y, point.x, true);
 }
@@ -124,7 +117,7 @@ void drawFood(Point &food) {
 }
 
 void updateInput() {
-  Wire.requestFrom(keypadAdderss, 1);
+  Wire.requestFrom(keypadAdderss, 2);
   if (Wire.available()) {
     char p1Key = Wire.read();
     char p2Key = Wire.read();
