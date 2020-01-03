@@ -1,5 +1,7 @@
 #include <Wire.h>
 
+const int address = 10;
+
 const char keyUp = 'U';
 const char keyDown = 'D';
 const char keyRight = 'R';
@@ -16,42 +18,52 @@ char keyMatrix[rowAmount][colAmount] = {
   {keyNone, keyNone,  keyNone,  keyNone}
 };
 
-static bool keyDownMatrix[rowAmount][colAmount];
+static bool p1KeyDownMatrix[rowAmount][colAmount];
+static bool p2KeyDownMatrix[rowAmount][colAmount];
 
-byte rowPins[rowAmount] = { 5, 4, 3, 2 };
-byte colPins[colAmount] = { 6, 7, 8, 9 };
+byte p1RowPins[rowAmount] = { 29, 27, 25, 23 };
+byte p1ColPins[colAmount] = { 28, 26, 24, 22 };
+byte p2RowPins[rowAmount] = { 37, 35, 33, 31 };
+byte p2ColPins[colAmount] = { 36, 34, 32, 30 };
 
-const int address = 10;
-
-char currentKey = keyNone;
+char message[2] = { keyNone, keyNone };
 
 void setup()
 {
   for (int i = 0; i < rowAmount; i++) {
-    pinMode(rowPins[i], OUTPUT);
-    digitalWrite(rowPins[i], HIGH);
+    pinMode(p1RowPins[i], OUTPUT);
+    pinMode(p2RowPins[i], OUTPUT);
+    digitalWrite(p1RowPins[i], HIGH);
+    digitalWrite(p2RowPins[i], HIGH);
   }
 
   for (int i = 0; i < colAmount; i++) {
-    pinMode(colPins[i], INPUT);
-    digitalWrite(colPins[i], HIGH);
+    pinMode(p1ColPins[i], INPUT);
+    pinMode(p2ColPins[i], INPUT);
+    digitalWrite(p1ColPins[i], HIGH);
+    digitalWrite(p2ColPins[i], HIGH);
   }
-  
+
+  Serial.begin(115200);
   Wire.begin(address);
   Wire.onRequest(handleRequest);
 }
 
 void loop()
 {
-  currentKey = getKey();
+  char p1CurrentKey = getKey(p1RowPins, p1ColPins);
+  char p2CurrentKey = getKey(p2RowPins, p2ColPins);
+  message[0] = p1CurrentKey;
+  message[1] = p2CurrentKey;
+  Serial.println(message);
 }
 
-char getKey()
+char getKey(byte rowPins[], byte colPins[])
 {
   char result = keyNone;
   for (int i = 0; i < rowAmount; i++) {
     for (int j = 0; j < colAmount; j++) {
-      if (isKeyDown(i, j)) {
+      if (isKeyDown(rowPins, colPins, i, j)) {
         return keyMatrix[i][j];
       }
     } 
@@ -59,7 +71,7 @@ char getKey()
   return keyNone;
 }
 
-bool isKeyDown(int i, int j)
+bool isKeyDown(byte rowPins[], byte colPins[], int i, int j)
 {
   bool result = false;
   digitalWrite(rowPins[i], LOW);
@@ -71,5 +83,5 @@ bool isKeyDown(int i, int j)
 }
 
 void handleRequest() {
-  Wire.write(currentKey);
+  Wire.write(message);
 }
