@@ -75,12 +75,15 @@ void loop() {
     if (game.isDraw()) {
       player1Servo.write(positionWin);
       player2Servo.write(positionWin);
+      Serial.println("Draw");
     }
     else if (game.isPlayer1Win()) {
       player1Servo.write(positionWin);
+      Serial.println("Player 1 won");
     }
     else {
       player1Servo.write(positionWin);
+      Serial.println("Player 2 won");
     }
     delay(500);
   }
@@ -98,7 +101,7 @@ Direction keyToDirection(char key) {
 
 void drawPoint(Point point) {
   int displayAdress = point.x / 8;
-  ledDisplay.setLed(displayAdress, boardSizeY - 1 - point.y, point.x, true);
+  ledDisplay.setLed(displayAdress, boardSizeY - 1 - point.y, point.x % 8, true);
 }
 
 void drawSnake(Snake &snake) {
@@ -128,6 +131,8 @@ void updateInput() {
     if (p2Key != keyNone) {
       player2CurrentKey = p2Key;
     }
+    char message[] = { p1Key, p2Key };
+    Serial.println(message);
   }
 }
 

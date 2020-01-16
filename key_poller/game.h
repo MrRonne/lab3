@@ -12,18 +12,18 @@ enum Direction {
 
 class Snake {
   public:
-    Snake(int maxBoardX, int maxBoardY, int initialX, int initialY) {
+    Snake(int maxBoardX, int maxBoardY, int initialX, int initialY, Direction initialDirection) {
       position[0].x = initialX;
       position[0].y = initialY;
       
-      position[1].x = initialX + 1;
+      position[1].x = initialX + (initialDirection == LEFT ? 1 : -1);
       position[1].y = initialY;
       
-      position[2].x = initialX + 2;
+      position[2].x = initialX + (initialDirection == LEFT ? 2 : -2);
       position[2].y = initialY;
       
       size = 3;
-      direction = LEFT;
+      direction = initialDirection;
       maxX = maxBoardX;
       maxY = maxBoardY;
             
@@ -129,8 +129,8 @@ enum GameState {
 class Game {
   public:
     Game(int maxBoardX, int maxBoardY):
-      player1(maxBoardX, maxBoardY, maxBoardX / 3, maxBoardY / 2),
-      player2(maxBoardX, maxBoardY, 2 * maxBoardX / 3, maxBoardY / 2) {
+      player1(maxBoardX, maxBoardY, maxBoardX / 3, maxBoardY / 2, RIGHT),
+      player2(maxBoardX, maxBoardY, 2 * maxBoardX / 3, maxBoardY / 2, LEFT) {
         maxX = maxBoardX;
         maxY = maxBoardY;
         food = generateFood();
@@ -205,7 +205,7 @@ class Game {
       return result;
     }
 
-    bool tryFeedSnake(Snake snake) {
+    bool tryFeedSnake(Snake &snake) {
       if (snake.containsPoint(food)) {
         snake.grow();
         return true;
