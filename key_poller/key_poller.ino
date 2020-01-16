@@ -97,7 +97,8 @@ Direction keyToDirection(char key) {
 }
 
 void drawPoint(Point point) {
-  ledDisplay.setLed(0, boardSizeY - 1 - point.y, point.x, true);
+  int displayAdress = point.x / 8;
+  ledDisplay.setLed(displayAdress, boardSizeY - 1 - point.y, point.x, true);
 }
 
 void drawSnake(Snake &snake) {
